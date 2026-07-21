@@ -1,3 +1,13 @@
+name: Bootstrap staging
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ready:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Bootstrap parts are being prepared"
 name: Bootstrap project
 
 on:
