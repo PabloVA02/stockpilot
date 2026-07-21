@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.pabloverdejo.stockpilot.common.RequestTraceFilter;
 import com.pabloverdejo.stockpilot.product.ProductRepository;
 import com.pabloverdejo.stockpilot.stock.StockMovementRepository;
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,8 @@ class ApiSecurityIntegrationTest {
     private StockMovementRepository movementRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private Flyway flyway;
 
     private MockMvc mockMvc;
 
@@ -50,6 +53,11 @@ class ApiSecurityIntegrationTest {
                 .build();
         movementRepository.deleteAll();
         productRepository.deleteAll();
+    }
+
+    @Test
+    void appliesFlywayMigrationsBeforeJpaSchemaValidation() {
+        assertThat(flyway.info().applied()).hasSize(2);
     }
 
     @Test
