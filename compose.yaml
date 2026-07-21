@@ -1,0 +1,42 @@
+services:
+  database:
+    image: postgres:18.4-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-stockpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-stockpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockpilot-local}
+    ports:
+      - "5432:5432"
+    volumes:
+      - stockpilot_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockpilot} -d ${POSTGRES_DB:-stockpilot}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: jdbc:postgresql://database:5432/${POSTGRES_DB:-stockpilot}
+      DATABASE_USERNAME: ${POSTGRES_USER:-stockpilot}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-stockpilot-local}
+      STOCKPILOT_MANAGER_USER: ${STOCKPILOT_MANAGER_USER:-manager}
+      STOCKPILOT_MANAGER_PASSWORD: ${STOCKPILOT_MANAGER_PASSWORD:-manager-local}
+      STOCKPILOT_VIEWER_USER: ${STOCKPILOT_VIEWER_USER:-viewer}
+      STOCKPILOT_VIEWER_PASSWORD: ${STOCKPILOT_VIEWER_PASSWORD:-viewer-local}
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  stockpilot_data:

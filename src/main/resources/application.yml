@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: stockpilot
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/stockpilot}
+    username: ${DATABASE_USERNAME:stockpilot}
+    password: ${DATABASE_PASSWORD:stockpilot-local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  web:
+    error:
+      include-message: never
+
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+stockpilot:
+  cors:
+    allowed-origin: ${ALLOWED_ORIGIN:http://localhost:5173}
+  security:
+    manager:
+      username: ${STOCKPILOT_MANAGER_USER:manager}
+      password: ${STOCKPILOT_MANAGER_PASSWORD:manager-local}
+    viewer:
+      username: ${STOCKPILOT_VIEWER_USER:viewer}
+      password: ${STOCKPILOT_VIEWER_PASSWORD:viewer-local}
