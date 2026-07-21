@@ -37,3 +37,53 @@ jobs:
       - run: npm ci
       - run: npm test -- --run
       - run: npm run build
+
+  containers:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: stockpilot
+      POSTGRES_USER: stockpilot
+      POSTGRES_PASSWORD: ci-only-postgres-password
+      STOCKPILOT_MANAGER_PASSWORD: ci-only-manager-password
+      STOCKPILOT_VIEWER_PASSWORD: ci-only-viewer-password
+      STOCKPILOT_JWT_SECRET: ci-only-signing-key-with-at-least-32-bytes
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate Compose configuration
+        run: docker compose config --quiet
+      - name: Build both isolated image contexts
+        run: docker compose build
+      - name: Start the complete stack
+        run: docker compose up --detach --no-build
+      - name: Wait for the API
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:8080/actuator/health > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs api
+          exit 1
+      - name: Verify Swagger and OpenAPI through Nginx
+        run: |
+          curl --fail --silent --show-error --location http://localhost:3000/swagger-ui.html --output /dev/null
+          curl --fail --silent --show-error http://localhost:3000/v3/api-docs --output openapi.json
+          grep --fixed-strings 'StockPilot API' openapi.json
+      - name: Verify PostgreSQL 18 data survives container recreation
+        run: |
+          docker compose exec --no-TTY database psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" --command \
+            "CREATE TABLE IF NOT EXISTS ci_persistence_probe (id INTEGER PRIMARY KEY); INSERT INTO ci_persistence_probe VALUES (1) ON CONFLICT DO NOTHING;"
+          docker compose up --detach --force-recreate database
+          for attempt in {1..30}; do
+            if docker compose exec --no-TTY database pg_isready --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"; then
+              break
+            fi
+            sleep 2
+          done
+          docker compose exec --no-TTY database psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
+            --tuples-only --no-align --command "SELECT id FROM ci_persistence_probe WHERE id = 1" > persistence-result.txt
+          grep --line-regexp '1' persistence-result.txt
+      - name: Stop the stack
+        if: always()
+        run: docker compose down --volumes
