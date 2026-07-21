@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/dashboard")
 @Tag(name = "Dashboard")
-@SecurityRequirement(name = "basicAuth")
+@SecurityRequirement(name = "bearerAuth")
 public class DashboardController {
 
     private final ProductRepository repository;

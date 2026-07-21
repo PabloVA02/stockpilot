@@ -12,7 +12,10 @@ export type Product = {
 
 export type ProductPage = {
   content: Product[]
+  number: number
+  size: number
   totalElements: number
+  totalPages: number
 }
 
 export type DashboardSummary = {

@@ -19,7 +19,10 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .description("REST API for products, stock movements and inventory indicators.")
                         .contact(new Contact().name("Pablo Verdejo Alonso")))
-                .components(new Components().addSecuritySchemes("basicAuth",
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")));
+                .components(new Components().addSecuritySchemes("bearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
     }
 }

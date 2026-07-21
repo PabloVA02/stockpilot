@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    password: ${DATABASE_PASSWORD:stockpilot-local}
+
+stockpilot:
+  security:
+    jwt:
+      secret: ${STOCKPILOT_JWT_SECRET:stockpilot-dev-signing-key-not-for-production}
+    manager:
+      password: ${STOCKPILOT_MANAGER_PASSWORD:manager-local}
+    viewer:
+      password: ${STOCKPILOT_VIEWER_PASSWORD:viewer-local}

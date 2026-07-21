@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:stockpilot;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+
+stockpilot:
+  security:
+    jwt:
+      secret: integration-test-signing-key-with-32-bytes
+      issuer: stockpilot-test
+      ttl: 5m
+    manager:
+      username: manager
+      password: manager-local
+    viewer:
+      username: viewer
+      password: viewer-local

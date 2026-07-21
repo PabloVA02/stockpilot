@@ -1,14 +1,14 @@
 import { type FormEvent, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, type Credentials } from '../api/client'
+import { api } from '../api/client'
 
-export function AddProductForm({ credentials }: { credentials: Credentials }) {
+export function AddProductForm({ accessToken }: { accessToken: string }) {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const mutation = useMutation({
     mutationFn: (form: HTMLFormElement) => {
       const data = new FormData(form)
-      return api.createProduct(credentials, {
+      return api.createProduct(accessToken, {
         sku: String(data.get('sku')),
         name: String(data.get('name')),
         description: String(data.get('description')),

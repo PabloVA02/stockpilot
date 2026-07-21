@@ -4,11 +4,11 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-stockpilot}
       POSTGRES_USER: ${POSTGRES_USER:-stockpilot}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockpilot-local}
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
     ports:
       - "5432:5432"
     volumes:
-      - stockpilot_data:/var/lib/postgresql/data
+      - stockpilot_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockpilot} -d ${POSTGRES_DB:-stockpilot}"]
       interval: 5s
@@ -20,11 +20,14 @@ services:
     environment:
       DATABASE_URL: jdbc:postgresql://database:5432/${POSTGRES_DB:-stockpilot}
       DATABASE_USERNAME: ${POSTGRES_USER:-stockpilot}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-stockpilot-local}
+      DATABASE_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
       STOCKPILOT_MANAGER_USER: ${STOCKPILOT_MANAGER_USER:-manager}
-      STOCKPILOT_MANAGER_PASSWORD: ${STOCKPILOT_MANAGER_PASSWORD:-manager-local}
+      STOCKPILOT_MANAGER_PASSWORD: "${STOCKPILOT_MANAGER_PASSWORD:?Set STOCKPILOT_MANAGER_PASSWORD in .env}"
       STOCKPILOT_VIEWER_USER: ${STOCKPILOT_VIEWER_USER:-viewer}
-      STOCKPILOT_VIEWER_PASSWORD: ${STOCKPILOT_VIEWER_PASSWORD:-viewer-local}
+      STOCKPILOT_VIEWER_PASSWORD: "${STOCKPILOT_VIEWER_PASSWORD:?Set STOCKPILOT_VIEWER_PASSWORD in .env}"
+      STOCKPILOT_JWT_SECRET: "${STOCKPILOT_JWT_SECRET:?Set a random STOCKPILOT_JWT_SECRET of at least 32 bytes in .env}"
+      STOCKPILOT_JWT_ISSUER: ${STOCKPILOT_JWT_ISSUER:-stockpilot}
+      STOCKPILOT_JWT_TTL: ${STOCKPILOT_JWT_TTL:-15m}
     ports:
       - "8080:8080"
     depends_on:
