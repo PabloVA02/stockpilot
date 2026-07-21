@@ -1,5 +1,7 @@
 # StockPilot
 
+[![CI](https://github.com/PabloVA02/stockpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/PabloVA02/stockpilot/actions/workflows/ci.yml)
+
 Full-stack inventory platform designed for small operations teams that need to control products, stock movements and replenishment alerts.
 
 The project combines a production-style Java API with a TypeScript dashboard and a PostgreSQL database. It focuses on business rules, transactional consistency, security, automated tests and reproducible deployment.
